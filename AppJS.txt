@@ -1,0 +1,48 @@
+import React, { useState } from "react";
+import "./App.css";
+import Chat from "./Chat";
+import io from "socket.io-client";
+
+const socket = io.connect("http://localhost:3000/");
+
+function App() {
+  const [name, setName] = useState("");
+  const [room, setRoom] = useState("");
+  const [showChat, setShowChat] = useState(false);
+
+  const joinRoom = () => {
+    if (name !== "" && room !== "") {
+      socket.emit("join_room", room);
+      setShowChat(true);
+    }
+  };
+
+  return (
+    <div className="App">
+      {/* <h1 style={{ color: "red" }}> App Page </h1> */}
+
+      {!showChat ? (
+        <div className="joinChatContainer">
+          <h2 style={{ color: "red" }}>Join Chat</h2>
+          <input
+            type="text"
+            placeholder="Name..."
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="RoomID..."
+            value={room}
+            onChange={(e) => setRoom(e.target.value)}
+          />
+          <button onClick={joinRoom}>Join Room</button>
+        </div>
+      ) : (
+        <Chat socket={socket} room={room} name={name} />
+      )}
+    </div>
+  );
+}
+
+export default App;
